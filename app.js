@@ -1,3 +1,5 @@
+const CARD_BACK = "/images/card_back.jpg";
+
 const cardsImages = [
     "images/hearts/ace_of_hearts.png",
     "images/hearts/seven_of_hearts.jpg",
@@ -16,24 +18,55 @@ const cardsImages = [
 document.addEventListener("DOMContentLoaded", () => {
     let container = document.querySelector(".container");
 
-    const cards = [...cardsImages, ...cardsImages]
+    let cards = [...cardsImages, ...cardsImages]
 
-    const board = shuffleArray(cards)
-
-    console.log(board)
+    const board = shuffleArray(cards);
 
     board.forEach((card, index) => {
-        const element = `<a href="#" id="${index}"><img src="/images/card_back.jpg" alt="card number ${index}"></a>`
+        const element = `<a href="#"><img id=${index} class="card" src="/images/card_back.jpg" alt="card number ${index}"></a>`
         container.insertAdjacentHTML("beforeend", element);
     });
 
+    cards = document.getElementsByClassName("card")
+
+    let selectedCards = []
+    let ids = []
+
+    Array.from(cards).forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault()
+            selectedCards.push(board[e.target.id])
+            ids.push(e.target.id)
+            e.target.setAttribute("src", board[e.target.id])
+            if (selectedCards.length === 2) {
+                if (selectedCards[0] === selectedCards[1]) {
+                    ids = []
+                    selectedCards = []
+                } else {
+                    document.getElementById(ids[0]).setAttribute("src", CARD_BACK);
+                    document.getElementById(ids[1]).setAttribute("src", CARD_BACK);
+                    ids.length = 0
+                    selectedCards.length = 0
+                }
+            }
+
+        });
+        if (isFinished() === undefined) removeEventListener('click', card);
+        console.log(isFinished())
+    })
+
+
+
 });
 
-let listOfCards = document.getElementsByTagName("a")
+function isFinished() {
+    const cards = document.getElementsByClassName("card");
+    return Array.from(cards).find(card => card.getAttribute("src") === CARD_BACK)
+}
 
-let selectedCard = [...listOfCards]
-
-console.log(selectedCard)
+function isEqual(selectedCards) {
+    return selectedCards[0].getAttribute("src") === selectedCards[1].getAttribute("src")
+}
 
 
 function shuffleArray(array) {
